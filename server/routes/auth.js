@@ -9,7 +9,7 @@ var router = express.Router();
 router.post("/login",(req,res) => {
 	var { username, password } = req.body;
 	User.findOne({where:{username:username}})
-		.then((user) => {
+		.then(user => {
 			if (user){
 				console.log("user found");
 				if (bcrypt.compareSync(password,user.password)){
@@ -49,8 +49,20 @@ router.post("/register",(req,res) => {
 					username: username,
 					password: hash
 				}).then(user => {
-					res.send({item:user});
-					return res.send("Registered");
+					var token = jwt.sign(
+						{
+							user_id:user.id,
+						},
+						config.secret,
+						{
+							expiresIn: "24h"
+						}
+					)
+					return res.json({
+						success: true,
+						message: "Registered successfully!",
+						token: token
+					})
 				})
 			}
 		})
