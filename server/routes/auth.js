@@ -36,4 +36,25 @@ router.post("/login",(req,res) => {
 		})
 })
 
+router.post("/register",(req,res) => {
+	var { username, password } = req.body;
+	User.findOne({where:{username:username}})
+		.then(user => {
+			if (user){
+				res.send("Username taken");
+			} else {
+				var salt = bcrypt.genSaltSync(saltRounds);
+				var hash = bcrypt.hashSync(password,salt)
+				User.create({
+					username: username,
+					password: hash
+				}).then(user => {
+					res.send({item:user});
+					return res.send("Registered");
+				})
+			}
+		})
+})
+
+
 module.exports = router;
