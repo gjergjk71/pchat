@@ -74,3 +74,14 @@ class RestAPI {
 	}
 
 }
+findAll_settings  = {
+	attributes: {
+		exclude: ["password"]
+	}
+}
+findOne_settings = {
+	attributes: {
+		exclude: ["password"]
+	}
+}
+
