@@ -21,7 +21,32 @@ router.get("/:id",(req,res) => {
 			res.json(user)
 		} else {
 			res.status(404)
-			res.send({
+			res.json({
+				success: false,
+				message: "User not found"
+			})
+		}
+	})
+})
+
+router.put("/:id",(req,res) => {
+	User.update(
+		{
+			...req.body
+		},
+		{where: {
+			id: req.params.id
+		}},
+	).then((user) => {
+		if (user){
+			res.json({
+				success: true,
+				message: "Successfully updated",
+				user: user
+			})
+		} else {
+			res.status(404);
+			return res.json({
 				success: false,
 				message: "User not found"
 			})
