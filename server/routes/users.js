@@ -26,33 +26,19 @@ router.get("/",(req,res) => {
 router.get("/:id",(req,res) => {
 	usersAPI.req = req;
 	usersAPI.res = res;
-	usersAPI.findOne_settings["where"] = {
-		id: req.params.id
-	}
 	return usersAPI.get_findOne;
 })
 
 router.put("/:id",(req,res) => {
-	update_settings = 	[
-		{...req.body},
-		{
-			where: {
-				id: req.params.id
-			}
-		}
-	]
 	usersAPI.req = req;
 	usersAPI.res = res;
-	usersAPI.update_settings = update_settings;
 	return usersAPI.get_update;
 })
 
 router.delete("/:id",(req,res) => {
 	middleware.verifyJWT(req,res,(req,res) => {
-		delete_settings = {where: {id:req.params.id}}
-		usersAPI.req = req;
-		usersAPI.res = res;
-		usersAPI.delete_settings = delete_settings;
+		usersAPI.req = req
+		usersAPI.res = res
 		return usersAPI.get_delete;
 	})
 })

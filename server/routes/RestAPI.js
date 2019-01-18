@@ -10,8 +10,6 @@ class RestAPI {
 		this.res = res;
 		this.findAll_settings = findAll_settings
 		this.findOne_settings = findOne_settings
-		this.update_settings = update_settings
-		this.delete_settings = delete_settings
 	}
 	findAll(settings){
 		this.model.findAll(settings)
@@ -21,6 +19,9 @@ class RestAPI {
 		this.findAll(this.findAll_settings);
 	}
 	findOne(settings){
+		this.findOne_settings["where"] = {
+			id: req.params.id
+		}
 		this.model.findOne(settings)
 		.then(instance => {
 			if (instance){
@@ -37,7 +38,15 @@ class RestAPI {
 	get get_findOne(){
 		this.findOne(this.findOne_settings);
 	}
-	update(settings){
+	update(){
+		var settings = 	[
+			{...this.req.body},
+			{
+				where: {
+					id: this.req.params.id
+				}
+			}
+		]
 		this.model.update(settings[0],settings[1])
 		.then((instance) => {
 			if (instance){
@@ -56,9 +65,10 @@ class RestAPI {
 		})
 	}
 	get get_update(){
-		this.update(this.update_settings)
+		this.update()
 	}
-	delete(settings){
+	delete(){
+		var settings = {where: {id:this.req.params.id}}
 		this.model.destroy(settings)
 		.then(() => this.res.json({
 			success: true,
@@ -66,19 +76,9 @@ class RestAPI {
 		}))
 	}
 	get get_delete(){
-		this.delete(this.delete_settings)
+		this.delete()
 	}
 
-}
-findAll_settings  = {
-	attributes: {
-		exclude: ["password"]
-	}
-}
-findOne_settings = {
-	attributes: {
-		exclude: ["password"]
-	}
 }
 
 module.exports = RestAPI;
