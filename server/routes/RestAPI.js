@@ -1,7 +1,9 @@
 class RestAPI {
-	constructor(req,res,model,findAll_settings,
-							  findOne_settings,
-							  name=undefined){
+	constructor(model,findAll_settings={},
+					  findOne_settings={},
+					  name=undefined,
+					  req=undefined,
+					  res=undefined){
 		this.name =  model.getTableName().slice(0,-1)
 		this.model = model;
 		this.req = req;
