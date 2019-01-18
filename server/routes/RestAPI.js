@@ -1,10 +1,8 @@
 class RestAPI {
 	constructor(req,res,model,findAll_settings,
 							  findOne_settings,
-							  update_settings,
-							  delete_settings,
 							  name=undefined){
-		this.name = name || model.getTableName()
+		this.name =  model.getTableName().slice(0,-1)
 		this.model = model;
 		this.req = req;
 		this.res = res;
@@ -20,7 +18,7 @@ class RestAPI {
 	}
 	findOne(settings){
 		this.findOne_settings["where"] = {
-			id: req.params.id
+			id: this.req.params.id
 		}
 		this.model.findOne(settings)
 		.then(instance => {
@@ -30,13 +28,25 @@ class RestAPI {
 				this.res.status(404)
 				this.res.json({
 					success: false,
-					message: `${this.name.slice(0,-1)} not found`
+					message: `${this.name} not found`
 				})
 			}
 		})
 	}
 	get get_findOne(){
 		this.findOne(this.findOne_settings);
+	}
+	create(){
+		this.model.create({
+			...this.req.body
+		}).then(instance => this.res.json({
+			success: true,
+			message: `${this.name}`,
+			instance: instance
+		})).catch(err => this.res.status(500).send("Something happened"));
+	}
+	get get_create(){
+		this.create();
 	}
 	update(){
 		var settings = 	[
@@ -72,13 +82,12 @@ class RestAPI {
 		this.model.destroy(settings)
 		.then(() => this.res.json({
 			success: true,
-			message: `Deleted ${this.name.slice(0,-1)} if it existed`
+			message: `Deleted ${this.name} if it existed`
 		}))
 	}
 	get get_delete(){
 		this.delete()
 	}
-
 }
 
 module.exports = RestAPI;
