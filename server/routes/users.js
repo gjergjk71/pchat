@@ -1,5 +1,6 @@
 var User = require("../models").User;
 var router = require("express").Router();
+const middleware = require("../middleware");
 
 router.get("/",(req,res) => {
 	User.findAll({
@@ -25,6 +26,17 @@ router.get("/:id",(req,res) => {
 				message: "User not found"
 			})
 		}
+	})
+})
+
+router.delete("/:id",(req,res) => {
+	middleware.verifyJWT(req,res,(req,res) => {
+		User.destroy({
+			where: {id:req.params.id}
+		}).then(() => res.json({
+			success: true,
+			message: "Deleted user if it existed"
+		}))
 	})
 })
 
