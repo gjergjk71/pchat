@@ -2,67 +2,75 @@ var User = require("../models").User;
 var router = require("express").Router();
 const middleware = require("../middleware");
 
-router.get("/",(req,res) => {
-	User.findAll({
-		attributes: {
-			exclude: ["password"]
-		}
-	}).then(users => res.json(users));
-})
-
-router.get("/:id",(req,res) => {
-	User.findOne({
-		where:{id:req.params.id},
-		attributes:{
-			exclude: ["password"]
-		}
-	}).then(user => {
-		if (user){
-			res.json(user)
-		} else {
-			res.status(404)
-			res.json({
-				success: false,
-				message: "User not found"
-			})
-		}
-	})
-})
-
-router.put("/:id",(req,res) => {
-	User.update(
-		{
-			...req.body
-		},
-		{where: {
-			id: req.params.id
-		}},
-	).then((user) => {
-		if (user){
-			res.json({
-				success: true,
-				message: "Successfully updated",
-				user: user
-			})
-		} else {
-			res.status(404);
-			return res.json({
-				success: false,
-				message: "User not found"
-			})
-		}
-	})
-})
-
-router.delete("/:id",(req,res) => {
-	middleware.verifyJWT(req,res,(req,res) => {
-		User.destroy({
-			where: {id:req.params.id}
-		}).then(() => res.json({
+class RestAPI {
+	constructor(req,res,model,findAll_settings,
+							  findOne_settings,
+							  update_settings,
+							  delete_settings,
+							  name=undefined){
+		this.name = name || model.getTableName()
+		this.model = model;
+		this.req = req;
+		this.res = res;
+		this.findAll_settings = findAll_settings
+		this.findOne_settings = findOne_settings
+		this.update_settings = update_settings
+		this.delete_settings = delete_settings
+	}
+	findAll(settings){
+		this.model.findAll(settings)
+			.then(users => this.res.json(users));
+	};
+	get get_findAll(){
+		this.findAll(this.findAll_settings);
+	}
+	findOne(settings){
+		this.model.findOne(settings)
+		.then(instance => {
+			if (instance){
+				this.res.json(instance)
+			} else {
+				this.res.status(404)
+				this.res.json({
+					success: false,
+					message: `${this.name.slice(0,-1)} not found`
+				})
+			}
+		})
+	}
+	get get_findOne(){
+		this.findOne(this.findOne_settings);
+	}
+	update(settings){
+		this.model.update(settings[0],settings[1])
+		.then((instance) => {
+			if (instance){
+				this.res.json({
+					success: true,
+					message: "Successfully updated",
+					instance: instance
+				})
+			} else {
+				this.res.status(404);
+				return this.res.json({
+					success: false,
+					message: `${this.name} not found`
+				})
+			}
+		})
+	}
+	get get_update(){
+		this.update(this.update_settings)
+	}
+	delete(settings){
+		this.model.destroy(settings)
+		.then(() => this.res.json({
 			success: true,
-			message: "Deleted user if it existed"
+			message: `Deleted ${this.name.slice(0,-1)} if it existed`
 		}))
-	})
-})
+	}
+	get get_delete(){
+		this.delete(this.delete_settings)
+	}
 
-module.exports = router;
+}
