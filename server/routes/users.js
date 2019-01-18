@@ -15,7 +15,7 @@ findOne_settings = {
 }
 
 
-var usersAPI = new RestAPI(undefined,undefined,User,findAll_settings,findOne_settings,undefined,undefined);
+var usersAPI = new RestAPI(undefined,undefined,User,findAll_settings,findOne_settings);
 
 router.get("/",(req,res) => {
 	usersAPI.req = req;
