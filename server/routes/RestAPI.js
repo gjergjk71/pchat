@@ -43,7 +43,7 @@ class RestAPI {
 			...this.req.body
 		}).then(instance => this.res.json({
 			success: true,
-			message: `${this.name}`,
+			message: `Created ${this.name}`,
 			instance: instance
 		})).catch(err => this.res.status(500).send("Something happened"));
 	}
